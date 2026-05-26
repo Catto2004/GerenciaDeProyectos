@@ -2,6 +2,8 @@
 from db.database import init_db
 from screens.Login import prompt_login
 from screens.Dashboard import show_dashboard
+from screens.Dashboard import developer_menu
+from screens.Dashboard import show_manual
 from screens.Candidatos import gestionar_candidatos
 from screens.Contratos import gestionar_contratos
 from screens.Reportes import mostrar_reportes
@@ -28,6 +30,10 @@ def main():
 		elif opc == "3":
 			mostrar_reportes()
 		elif opc == "4":
+			developer_menu()
+		elif opc == "5":
+			show_manual()
+		elif opc == "6":
 			print("Saliendo. Hasta luego.")
 			break
 		else:

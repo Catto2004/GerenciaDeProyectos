@@ -68,3 +68,32 @@ def despedir_empleado(candidato_id: int) -> bool:
     conn.commit()
     conn.close()
     return changed > 0
+
+
+def seed_4_contratos() -> int:
+    """Create four sample contracts for the first available candidates."""
+    from datetime import date
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM candidatos ORDER BY id LIMIT 4")
+    rows = cur.fetchall()
+    if not rows:
+        conn.close()
+        return 0
+
+    tipos = ["Temporal", "Indefinido", "Temporal", "Indefinido"]
+    created = 0
+    today = date.today().isoformat()
+    for idx, row in enumerate(rows):
+        candidato_id = row[0]
+        tipo = tipos[idx % len(tipos)]
+        cur.execute(
+            "INSERT INTO contratos(candidato_id, fecha, tipo) VALUES(?,?,?)",
+            (candidato_id, today, tipo),
+        )
+        cur.execute("UPDATE candidatos SET estado = ? WHERE id = ?", ("Contratado", candidato_id))
+        created += 1
+    conn.commit()
+    conn.close()
+    return created

@@ -39,6 +39,35 @@ def seed_candidatos() -> int:
     return insertados
 
 
+def seed_10_candidatos() -> int:
+    """Insert ten sample candidates, replacing the earlier small sample set."""
+    ejemplos = [
+        ("Juan Perez", "juan.perez@example.com", "3001112233", "Registrado"),
+        ("Maria Gomez", "maria.gomez@example.com", "3002223344", "Evaluado"),
+        ("Pedro Ruiz", "pedro.ruiz@example.com", "3003334455", "Contratado"),
+        ("Laura Torres", "laura.torres@example.com", "3004445566", "Registrado"),
+        ("Carlos Diaz", "carlos.diaz@example.com", "3005556677", "Registrado"),
+        ("Ana Lopez", "ana.lopez@example.com", "3006667788", "Evaluado"),
+        ("Sofia Rojas", "sofia.rojas@example.com", "3007778899", "Registrado"),
+        ("Diego Martinez", "diego.martinez@example.com", "3008889900", "Registrado"),
+        ("Valentina Castro", "valentina.castro@example.com", "3010001122", "Evaluado"),
+        ("Andres Moreno", "andres.moreno@example.com", "3011112233", "Registrado"),
+    ]
+
+    conn = get_connection()
+    cur = conn.cursor()
+    insertados = 0
+    for nombre, correo, telefono, estado in ejemplos:
+        cur.execute(
+            "INSERT INTO candidatos(nombre, correo, telefono, estado) VALUES(?,?,?,?)",
+            (nombre, correo, telefono, estado),
+        )
+        insertados += 1
+    conn.commit()
+    conn.close()
+    return insertados
+
+
 def list_candidatos() -> List[Dict]:
     conn = get_connection()
     cur = conn.cursor()

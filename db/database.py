@@ -56,6 +56,20 @@ def init_db():
     conn.close()
 
 
+def clear_business_data():
+    """Remove application data from candidatos and contratos, preserving users."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM contratos")
+    cur.execute("DELETE FROM candidatos")
+    try:
+        cur.execute("DELETE FROM sqlite_sequence WHERE name IN ('contratos', 'candidatos')")
+    except sqlite3.OperationalError:
+        pass
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     init_db()
     print(f"Database initialized at: {DB_PATH}")
