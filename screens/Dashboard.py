@@ -2,7 +2,8 @@ from pathlib import Path
 from services.Candidatos import count_total as total_candidatos, seed_10_candidatos
 from services.Contratos import count_total as total_contratos, seed_4_contratos
 from db.database import clear_business_data
-from utils.ui import clear_screen
+from utils.ui import clear_screen, pause
+from utils.status import render_status_panel, set_status
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -15,17 +16,23 @@ MANUAL_PATH = Path(__file__).resolve().parents[1] / "README.md"
 def show_manual():
     clear_screen()
     console.rule("[bold blue]Manual de Usuario")
+    console.print(render_status_panel())
     if not MANUAL_PATH.exists():
         console.print(Panel("No se encontró README.md.", style="red"))
+        set_status("No se encontró el manual de usuario")
+        pause()
         return
     content = MANUAL_PATH.read_text(encoding="utf-8")
     console.print(Markdown(content))
+    set_status("Manual de usuario abierto")
+    pause()
 
 
 def developer_menu():
     while True:
         clear_screen()
         console.rule("[bold magenta]Desarrollador")
+        console.print(render_status_panel())
         menu = Panel.fit(
             "[b magenta]Acciones:[/b magenta]\n[magenta]1 - Limpiar BD[/magenta]\n[magenta]2 - Cargar Ejemplo[/magenta]\n[magenta]3 - Volver[/magenta]",
             title="Desarrollador",
@@ -35,26 +42,34 @@ def developer_menu():
         opc = console.input("Seleccione opción: ").strip()
         if opc == "1":
             clear_business_data()
+            set_status("Base de datos limpiada: candidatos y contratos en 0")
             console.print(Panel("Base de datos limpiada: candidatos y contratos en 0.", style="magenta"))
+            pause()
         elif opc == "2":
             clear_business_data()
             n_candidatos = seed_10_candidatos()
             n_contratos = seed_4_contratos()
+            set_status(f"Ejemplo cargado: {n_candidatos} candidatos y {n_contratos} contratos")
             console.print(
                 Panel(
                     f"Ejemplo cargado: {n_candidatos} candidatos y {n_contratos} contratos.",
                     style="magenta",
                 )
             )
+            pause()
         elif opc == "3":
+            set_status("Regresando al dashboard")
             return
         else:
+            set_status("Opción inválida en Desarrollador")
             console.print(Panel("Opción inválida", style="magenta"))
+            pause()
 
 
 def show_dashboard():
     clear_screen()
     console.rule("[bold blue]Dashboard")
+    console.print(render_status_panel())
     t = Table(show_header=False, box=None)
     t.add_column("k", width=20)
     t.add_column("v")
@@ -62,7 +77,7 @@ def show_dashboard():
     t.add_row("Total contratos:", str(total_contratos()))
     console.print(t)
     menu = Panel.fit(
-        "[b]Opciones:[/b]\n1 - Gestionar candidatos\n2 - Generar contrato\n3 - Reportes\n4 - Desarrollador\n5 - Manual de usuario\n6 - Salir",
+        "[b]Opciones:[/b]\n1 - Gestionar candidatos\n2 - Gestión de contratos\n3 - Reportes\n4 - Desarrollador\n5 - Manual de usuario\n6 - Salir",
         title="Menú",
         border_style="green",
     )
