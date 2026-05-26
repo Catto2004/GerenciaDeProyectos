@@ -37,3 +37,34 @@ def count_total() -> int:
     n = cur.fetchone()[0]
     conn.close()
     return n
+
+
+def list_contratados() -> List[Dict]:
+    """Return list of contracted candidates with contract type and date."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT candidatos.id, candidatos.nombre, contratos.tipo, contratos.fecha
+        FROM contratos
+        JOIN candidatos ON contratos.candidato_id = candidatos.id
+        ORDER BY contratos.id
+        """
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return [{"id": r[0], "nombre": r[1], "tipo": r[2], "fecha": r[3]} for r in rows]
+
+
+def despedir_empleado(candidato_id: int) -> bool:
+    """Fire an employee: delete their contracts and set candidate estado to 'Despedido'. Returns True if candidate existed."""
+    conn = get_connection()
+    cur = conn.cursor()
+    # Delete contracts
+    cur.execute("DELETE FROM contratos WHERE candidato_id = ?", (candidato_id,))
+    # Update estado
+    cur.execute("UPDATE candidatos SET estado = ? WHERE id = ?", ("Despedido", candidato_id))
+    changed = cur.rowcount
+    conn.commit()
+    conn.close()
+    return changed > 0

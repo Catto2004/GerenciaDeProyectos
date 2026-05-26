@@ -15,6 +15,30 @@ def add_candidato(nombre: str, correo: str, telefono: str, estado: str = "Regist
     return cid
 
 
+def seed_candidatos() -> int:
+    """Insert a small set of sample candidates if they do not already exist."""
+    ejemplos = [
+        ("Juan Perez", "juan.perez@example.com", "3001112233", "Registrado"),
+        ("Maria Gomez", "maria.gomez@example.com", "3002223344", "Evaluado"),
+        ("Pedro Ruiz", "pedro.ruiz@example.com", "3003334455", "Contratado"),
+    ]
+
+    conn = get_connection()
+    cur = conn.cursor()
+    insertados = 0
+    for nombre, correo, telefono, estado in ejemplos:
+        cur.execute("SELECT 1 FROM candidatos WHERE correo = ?", (correo,))
+        if cur.fetchone() is None:
+            cur.execute(
+                "INSERT INTO candidatos(nombre, correo, telefono, estado) VALUES(?,?,?,?)",
+                (nombre, correo, telefono, estado),
+            )
+            insertados += 1
+    conn.commit()
+    conn.close()
+    return insertados
+
+
 def list_candidatos() -> List[Dict]:
     conn = get_connection()
     cur = conn.cursor()
@@ -42,3 +66,16 @@ def count_by_estado() -> Dict[str, int]:
     rows = cur.fetchall()
     conn.close()
     return {r[0]: r[1] for r in rows}
+
+
+def delete_candidato(candidato_id: int) -> bool:
+    """Delete a candidato and any related contracts. Returns True if a row was deleted."""
+    conn = get_connection()
+    cur = conn.cursor()
+    # Remove contratos first to keep DB consistent
+    cur.execute("DELETE FROM contratos WHERE candidato_id = ?", (candidato_id,))
+    cur.execute("DELETE FROM candidatos WHERE id = ?", (candidato_id,))
+    deleted = cur.rowcount
+    conn.commit()
+    conn.close()
+    return deleted > 0
