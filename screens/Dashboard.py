@@ -10,7 +10,7 @@ from rich.panel import Panel
 from rich.markdown import Markdown
 
 console = Console()
-MANUAL_PATH = Path(__file__).resolve().parents[1] / "README.md"
+MANUAL_PATH = Path(__file__).resolve().parents[1] / "ManualDeUsuario.md"
 
 
 def show_manual():
