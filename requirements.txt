@@ -1,0 +1,2 @@
+# No external requirements. Uses Python standard library (sqlite3).
+# If you want a nicer TUI later, add: textual

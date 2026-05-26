@@ -1,0 +1,140 @@
+En este documento está todo el plan de desarrollo para el proyecto, copilot, no dudes en preguntarme
+para cualquier cosa antes de seguir, el proyecto se está haciendo en Python con Textual y SQLite
+la idea es que el poryecto este en el menor tiempo posible y sea lo mas simple posible,
+es un proyecto academico:
+Alcance del prototipo académico:
+Debido al alcance temporal del curso se implementó una versión funcional parcial centrada en validar la arquitectura propuesta.
+
+GerenciaDeProyectos/
+│
+├── app.py
+├── db/
+│   ├── database.py
+│   └── innovatech.db
+│
+├── screens/
+│   ├── Login.py
+│   ├── Dashboard.py
+│   ├── Candidatos.py
+│   ├── Contratos.py
+│   └── Reportes.py
+│
+├── services/
+│   ├── Auth.py
+│   ├── Candidatos.py
+│   └── Contratos.py
+│
+└── README.md
+└── LICENSE.md
+
+Para tu contexto (entrega hoy, clase, objetivo = pasar), yo NO usaría CSV.
+
+Mi recomendación es:
+
+Python + Textual + SQLite
+
+No Postgres, no MySQL, no CSV.
+
+Por qué SQLite
+Es un solo archivo (innovatech.db)
+No requiere instalar servidor
+Funciona perfecto con Python (sqlite3)
+Se ve más “ingeniería de software” que CSV
+Permite consultas reales
+Si el profe pregunta “¿por qué base de datos?” tienes respuesta sólida
+
+Y sigue siendo casi igual de simple que CSV.
+
+Base de datos mínima
+usuarios
+CREATE TABLE usuarios(
+    id INTEGER PRIMARY KEY,
+    usuario TEXT,
+    password TEXT
+);
+candidatos
+CREATE TABLE candidatos(
+    id INTEGER PRIMARY KEY,
+    nombre TEXT,
+    correo TEXT,
+    telefono TEXT,
+    estado TEXT
+);
+
+estado:
+
+Registrado
+Evaluado
+Contratado
+contratos
+CREATE TABLE contratos(
+    id INTEGER PRIMARY KEY,
+    candidato_id INTEGER,
+    fecha TEXT,
+    tipo TEXT
+);
+Flujo mínimo
+Login
+admin
+1234
+
+↓
+
+Dashboard
+Total candidatos
+Total contratos
+Reportes
+Salir
+
+↓
+
+Gestión candidatos
+[Agregar]
+
+Nombre
+Correo
+Teléfono
+
+[Guardar]
+
+Lista:
+Juan
+Maria
+Pedro
+
+↓
+
+Generar contrato
+
+Seleccionar:
+
+Juan
+
+[Generar]
+
+Sistema:
+
+Contrato generado exitosamente
+
+(guardar fila en DB, NO PDF real)
+
+↓
+
+Reportes
+
+Mostrar:
+
+Total candidatos: 8
+
+Contratados: 3
+
+Pendientes: 5
+Lo que NO implementaría
+
+❌ Contraseña segura
+❌ JWT
+❌ ORM
+❌ Exportar PDF
+❌ Integración seguridad social
+❌ Registro de usuarios
+❌ CRUD completo
