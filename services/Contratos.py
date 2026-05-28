@@ -97,3 +97,44 @@ def seed_4_contratos() -> int:
     conn.commit()
     conn.close()
     return created
+
+
+def update_contrato(contrato_id: int, fecha: str = None, tipo: str = None) -> bool:
+    """Update a contrato's information. Returns True if updated, False if not found."""
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    # Build dynamic update query
+    fields = []
+    values = []
+    
+    if fecha is not None:
+        fields.append("fecha = ?")
+        values.append(fecha)
+    if tipo is not None:
+        fields.append("tipo = ?")
+        values.append(tipo)
+    
+    if not fields:
+        conn.close()
+        return False
+    
+    values.append(contrato_id)
+    query = f"UPDATE contratos SET {', '.join(fields)} WHERE id = ?"
+    cur.execute(query, values)
+    updated = cur.rowcount
+    conn.commit()
+    conn.close()
+    return updated > 0
+
+
+def get_contrato_by_id(contrato_id: int) -> Dict:
+    """Get a contrato by ID."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, candidato_id, fecha, tipo FROM contratos WHERE id = ?", (contrato_id,))
+    row = cur.fetchone()
+    conn.close()
+    if row:
+        return {"id": row[0], "candidato_id": row[1], "fecha": row[2], "tipo": row[3]}
+    return None

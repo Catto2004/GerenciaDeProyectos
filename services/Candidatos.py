@@ -108,3 +108,55 @@ def delete_candidato(candidato_id: int) -> bool:
     conn.commit()
     conn.close()
     return deleted > 0
+
+
+def update_candidato(candidato_id: int, nombre: str = None, correo: str = None, telefono: str = None, estado: str = None) -> bool:
+    """Update a candidato's information. Returns True if updated, False if not found."""
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    # Build dynamic update query
+    fields = []
+    values = []
+    
+    if nombre is not None:
+        fields.append("nombre = ?")
+        values.append(nombre)
+    if correo is not None:
+        fields.append("correo = ?")
+        values.append(correo)
+    if telefono is not None:
+        fields.append("telefono = ?")
+        values.append(telefono)
+    if estado is not None:
+        fields.append("estado = ?")
+        values.append(estado)
+    
+    if not fields:
+        conn.close()
+        return False
+    
+    values.append(candidato_id)
+    query = f"UPDATE candidatos SET {', '.join(fields)} WHERE id = ?"
+    cur.execute(query, values)
+    updated = cur.rowcount
+    conn.commit()
+    conn.close()
+    return updated > 0
+
+
+def get_candidato_by_id(candidato_id: int) -> Dict:
+    """Get a candidato by ID."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, nombre, correo, telefono, estado FROM candidatos WHERE id = ?", (candidato_id,))
+    row = cur.fetchone()
+    conn.close()
+    if row:
+        return {"id": row[0], "nombre": row[1], "correo": row[2], "telefono": row[3], "estado": row[4]}
+    return None
+
+
+def obtener_todos_candidatos() -> List[Dict]:
+    """Alias for list_candidatos - returns all candidates."""
+    return list_candidatos()

@@ -77,7 +77,7 @@ def show_dashboard():
     t.add_row("Total contratos:", str(total_contratos()))
     console.print(t)
     menu = Panel.fit(
-        "[b]Opciones:[/b]\n1 - Gestionar candidatos\n2 - Gestión de contratos\n3 - Reportes\n4 - Desarrollador\n5 - Manual de usuario\n6 - Salir",
+        "[b]Opciones:[/b]\n1 - Gestionar candidatos\n2 - Gestión de contratos\n3 - Reportes\n4 - Gestión de Recursos Humanos\n5 - Desarrollador\n6 - Manual de usuario\n7 - Salir",
         title="Menú",
         border_style="green",
     )

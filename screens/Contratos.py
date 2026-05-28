@@ -1,5 +1,5 @@
 from services.Candidatos import list_candidatos
-from services.Contratos import generar_contrato, despedir_empleado, list_contratos, list_contratados
+from services.Contratos import generar_contrato, despedir_empleado, list_contratos, list_contratados, update_contrato, get_contrato_by_id
 from datetime import date
 from rich.console import Console
 from rich.table import Table
@@ -16,7 +16,7 @@ def gestionar_contratos():
         console.rule("[bold blue]Gestión de Contratos")
         console.print(render_status_panel())
         menu = Panel.fit(
-            "[b]Opciones:[/b]\n1 - Generar contrato\n2 - Despedir empleado\n3 - Listar empleados\n4 - Volver",
+            "[b]Opciones:[/b]\n1 - Generar contrato\n2 - Despedir empleado\n3 - Listar empleados\n4 - Editar contrato\n5 - Volver",
             title="Contratos",
             border_style="green",
         )
@@ -95,6 +95,53 @@ def gestionar_contratos():
                 set_status(f"Listado de empleados mostrado: {len(empleados)} registros")
             pause()
         elif opc == "4":
+            # Editar contrato
+            contratos = list_contratos()
+            if not contratos:
+                set_status("No hay contratos registrados")
+                console.print(Panel("No hay contratos registrados para editar.", style="yellow"))
+                pause()
+                continue
+            table = Table(title="Contratos registrados")
+            table.add_column("Contrato ID", style="cyan", width=10)
+            table.add_column("Candidato ID", style="magenta", width=10)
+            table.add_column("Tipo", style="green")
+            table.add_column("Fecha", style="yellow")
+            for contrato in contratos:
+                table.add_row(str(contrato["id"]), str(contrato["candidato_id"]), contrato["tipo"], str(contrato["fecha"]))
+            console.print(table)
+            try:
+                contrato_id = int(console.input("Id de contrato a editar: ").strip())
+            except ValueError:
+                set_status("Id inválido al editar contrato")
+                console.print(Panel("Id inválido", style="red"))
+                pause()
+                continue
+            contrato = get_contrato_by_id(contrato_id)
+            if not contrato:
+                set_status("Contrato no encontrado")
+                console.print(Panel("Contrato no encontrado.", style="red"))
+                pause()
+                continue
+            # Mostrar datos actuales y pedir nuevos valores
+            console.print(Panel(f"Datos actuales:\nFecha: {contrato['fecha']}\nTipo: {contrato['tipo']}", title=f"Editar contrato {contrato_id}"))
+            nueva_fecha = console.input(f"Nueva fecha (actual: {contrato['fecha']}): ").strip()
+            nuevo_tipo = console.input(f"Nuevo tipo (actual: {contrato['tipo']}): ").strip()
+            
+            # Update if fields are not empty
+            ok = update_contrato(
+                contrato_id,
+                fecha=nueva_fecha if nueva_fecha else None,
+                tipo=nuevo_tipo if nuevo_tipo else None
+            )
+            if ok:
+                set_status(f"Contrato {contrato_id} actualizado")
+                console.print(Panel(f"Contrato {contrato_id} actualizado.", style="green"))
+            else:
+                set_status("Error al actualizar contrato")
+                console.print(Panel("Error al actualizar contrato.", style="red"))
+            pause()
+        elif opc == "5":
             set_status("Regresando al dashboard")
             return
         else:
